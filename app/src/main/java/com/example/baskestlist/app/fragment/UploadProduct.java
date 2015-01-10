@@ -1,5 +1,6 @@
 package com.example.baskestlist.app.fragment;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -17,8 +18,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.example.baskestlist.app.R;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -32,6 +42,7 @@ import org.json.JSONObject;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -64,7 +75,7 @@ public class UploadProduct extends Fragment {
     /**
      * *******  File Path ************
      */
-    private String uploadimagePath = Environment.getExternalStorageDirectory().getPath() + "yyyyyymmmyyy.jpg";
+    private String uploadimagePath;
     private String uploadserverURI = null;
     private ImageView imageView;
     ProgressDialog dialog = null;
@@ -77,26 +88,29 @@ public class UploadProduct extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.uploadproduct, container, false);
-
+        uploadimagePath = Environment.getExternalStorageDirectory().toString() + "/BasketList";
+        File uploadImage = new File(uploadimagePath);
+        if(!uploadImage.isDirectory()){
+            uploadImage.mkdir();
+        }
         return view;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Bitmap photo = (Bitmap) data.getExtras().get("data");
-        imageCaptured.setImageBitmap(photo);
+        super.onActivityResult(requestCode, resultCode, data);
 
         Log.e("ACTIVITY_RESULT", ""+ requestCode + " " + resultCode);
-        if (requestCode == 1 && requestCode == RESULT_OK) {
-
-            Uri selectediamge = data.getData();
-            uploadimagePath = getPath(selectediamge);
-            Bitmap bitmap = BitmapFactory.decodeFile(uploadimagePath);
-            imageView.setImageBitmap(bitmap);
-            messageText.setText("Uploading file path:" + uploadimagePath);
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Log.e("IMAGE PATH",fileUri.getPath());
+            startUpload(fileUri.getPath());
         }
 
+    }
 
+    private void startUpload(String fileDir){
+        Bitmap photo = BitmapFactory.decodeFile(fileDir);
+        imageCaptured.setImageBitmap(photo);
     }
 
     private String getPath(Uri uri) {
@@ -355,6 +369,16 @@ public class UploadProduct extends Fragment {
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                File image = null;
+
+                try{
+                    image = File.createTempFile("" + System.currentTimeMillis(), ".jpg", new File(uploadimagePath));
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
+                Log.e("TEMP FILE", image.getPath());
+                fileUri = Uri.fromFile(image);
+
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                 startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
