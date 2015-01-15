@@ -1,21 +1,31 @@
 package com.example.baskestlist.app;
-import android.app.*;
+
+import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v4.app.*;
-import android.view.*;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.baskestlist.app.fragment.*;
-import com.google.android.gms.maps.SupportMapFragment;
+
+import com.example.baskestlist.app.fragment.Gallery;
+import com.example.baskestlist.app.fragment.Home;
+import com.example.baskestlist.app.fragment.Map;
+import com.example.baskestlist.app.fragment.UploadProduct;
+
 import static com.example.baskestlist.app.R.id.container;
 
 public class MainActivity extends FragmentActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
